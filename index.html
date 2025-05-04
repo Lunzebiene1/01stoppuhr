@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>OL-Stoppuhr</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; padding: 2em; }
+    h1 { font-size: 2em; }
+    #time { font-size: 3em; margin: 1em 0; }
+  </style>
+</head>
+<body>
+  <h1>Orientierungslauf Stoppuhr</h1>
+  <div id="time">00:00.000</div>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const action = urlParams.get("action");
+    let startTime, interval;
+
+    function updateTime() {
+      const now = Date.now();
+      const diff = now - startTime;
+      const minutes = Math.floor(diff / 60000);
+      const seconds = Math.floor((diff % 60000) / 1000);
+      const milliseconds = diff % 1000;
+      document.getElementById("time").textContent =
+        `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(milliseconds).padStart(3, '0')}`;
+    }
+
+    if (action === "start") {
+      startTime = Date.now();
+      interval = setInterval(updateTime, 50);
+      localStorage.setItem("startTime", startTime);
+    } else if (action === "stop") {
+      const lastTime = localStorage.getItem("startTime");
+      if (lastTime) {
+        const diff = Date.now() - Number(lastTime);
+        const minutes = Math.floor(diff / 60000);
+        const seconds = Math.floor((diff % 60000) / 1000);
+        const milliseconds = diff % 1000;
+        document.getElementById("time").textContent =
+          `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(milliseconds).padStart(3, '0')}`;
+      } else {
+        document.getElementById("time").textContent = "Nicht gestartet.";
+      }
+    }
+  </script>
+</body>
+</html>
